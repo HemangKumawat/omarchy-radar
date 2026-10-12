@@ -188,8 +188,12 @@ Panel {
     // explicitly after every model change instead of through bindings.
     function refit() {
         Qt.callLater(function () {
-            var res = Math.min(Style.space(760), Math.max(Style.space(90), resultsColumn.implicitHeight));
-            var rec = Math.min(Style.space(760), Math.max(Style.space(90), recentsColumn.implicitHeight));
+            // Cap the scrolling body so header and footer still fit on short screens.
+            var cap = Style.space(760);
+            if (panel.availableCardHeight > 0)
+                cap = Math.max(Style.space(90), Math.min(cap, panel.availableCardHeight - panel.verticalContentInset - (contentColumn.implicitHeight - bodyItem.height)));
+            var res = Math.min(cap, Math.max(Style.space(90), resultsColumn.implicitHeight));
+            var rec = Math.min(cap, Math.max(Style.space(90), recentsColumn.implicitHeight));
             resultsFlick.height = res;
             recentsFlick.height = rec;
             resultsFlick.contentHeight = resultsColumn.implicitHeight;
