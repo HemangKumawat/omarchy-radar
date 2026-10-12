@@ -169,6 +169,16 @@ Panel {
         showToast(message || "Copied to clipboard");
     }
 
+    // Optional hand-off to a heavier tool (e.g. SpiderFoot), set in widget settings.
+    readonly property string deepScanCommand: String(root.settings && root.settings.deepScanCommand || "").trim()
+
+    function deepScan() {
+        if (!currentTarget || deepScanCommand === "")
+            return;
+        Quickshell.execDetached(["bash", "-c", deepScanCommand + " " + Util.shellQuote(currentTarget.value)]);
+        showToast("Deep scan started");
+    }
+
     function copyReport() {
         if (!currentTarget)
             return;
@@ -769,6 +779,24 @@ Panel {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: root.copyReport()
+                            }
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: root.deepScanCommand !== ""
+                            text: "deep scan"
+                            color: deepHover.containsMouse ? root.contentForeground : Qt.darker(root.contentForeground, 1.6)
+                            font.family: root.contentFontFamily
+                            font.pixelSize: Style.font.caption
+                            font.underline: deepHover.containsMouse
+
+                            MouseArea {
+                                id: deepHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.deepScan()
                             }
                         }
 
